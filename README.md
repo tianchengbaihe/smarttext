@@ -564,13 +564,10 @@ Both `system` and `expr` support template syntax (Mustache + CEL via `[[ ]]`):
 |--------|------|-------------|
 | GET | `/api/v1/health` | Health check |
 | GET | `/api/v1/documents` | List documents |
-| POST | `/api/v1/documents` | Upload document |
 | GET | `/api/v1/documents/{namespace}/{id}/{version}` | Get document |
 | GET | `/api/v1/documents/{namespace}/{id}/{version}/contents` | Get contents |
 | GET | `/api/v1/documents/{namespace}/{id}/{version}/contents/{fragment}` | Get specific fragment |
-| POST | `/api/v1/documents/{namespace}/{id}/{version}/status` | Update status |
 | POST | `/api/v1/documents/{namespace}/{id}/{version}/services/{name}` | Execute service |
-| POST | `/api/v1/documents/{namespace}/{id}/{version}/preview/{name}` | Preview LLM prompt |
 
 ### 6.3 Response Format
 

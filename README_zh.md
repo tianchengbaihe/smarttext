@@ -562,13 +562,10 @@ Mustache 语法，支持 `[[ ]]` 内嵌 CEL 表达式：
 |------|------|------|
 | GET | `/api/v1/health` | 健康检查 |
 | GET | `/api/v1/documents` | 列出文档 |
-| POST | `/api/v1/documents` | 上传文档 |
 | GET | `/api/v1/documents/{namespace}/{id}/{version}` | 获取文档 |
 | GET | `/api/v1/documents/{namespace}/{id}/{version}/contents` | 获取 contents 内容 |
 | GET | `/api/v1/documents/{namespace}/{id}/{version}/contents/{fragment}` | 获取指定片段 |
-| POST | `/api/v1/documents/{namespace}/{id}/{version}/status` | 更新状态 |
 | POST | `/api/v1/documents/{namespace}/{id}/{version}/services/{name}` | 执行服务 |
-| POST | `/api/v1/documents/{namespace}/{id}/{version}/preview/{name}` | 预览 LLM 提示词 |
 
 ### 6.3 响应格式
 
