@@ -8,6 +8,12 @@
 
 ---
 
+![Smart Text Document Structure](docs/smart-text-structure.png)
+
+![Smart Text Directory Layout](docs/smart-text-directory.png)
+
+---
+
 ## Table of Contents
 
 1. [Overview](#1-overview)

@@ -6,6 +6,12 @@
 
 ---
 
+![Smart Text Document Structure](docs/smart-text-structure.png)
+
+![Smart Text Directory Layout](docs/smart-text-directory.png)
+
+---
+
 ## 目录
 
 1. [概述](#1-概述)
