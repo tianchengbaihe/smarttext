@@ -1,5 +1,7 @@
 # Smart Text Protocol Specification v1.0.0
 
+[English](README.md) | [中文](README_zh.md)
+
 ---
 
 **Version**: 1.0.0 | **Protocol Date**: 2026-03-15 | **License**: MIT
