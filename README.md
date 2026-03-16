@@ -12,12 +12,17 @@
 
 1. [Overview](#1-overview)
 2. [Quick Start](#2-quick-start)
+   - 2.1 [Example: Hypertension Treatment Guide](#21-example-hypertension-treatment-guide)
+   - 2.2 [Example: Health Risk Assessment Assistant](#22-example-health-risk-assessment-assistant)
+   - 2.3 [Directory Layout Option](#23-directory-layout-option)
 3. [Protocol Overview](#3-protocol-overview)
 4. [Core Concepts](#4-core-concepts)
 5. [Service Types in Detail](#5-service-types-in-detail)
 6. [HTTP API](#6-http-api)
 7. [MCP Interface](#7-mcp-interface)
 8. [Detailed Specifications](#8-detailed-specifications)
+   - 8.4 [File Storage (Single File)](#84-file-storage-single-file)
+   - 8.5 [File Storage (Directory Layout)](#85-file-storage-directory-layout)
 
 ---
 
@@ -195,6 +200,29 @@ curl -X POST http://localhost:8088/api/v1/documents/health/risk-assistant/1.0.0/
   -H "Content-Type: application/json" \
   -d '{"systolic": 155, "diastolic": 98}'
 ```
+
+### 2.3 Directory Layout Option
+
+Instead of a single YAML file, you can organize documents as a directory:
+
+```
+health/risk_assistant/1.0.0/
+├── main.yaml          # Can be empty or omitted
+├── meta.yaml          # Optional metadata
+├── contents.md        # Or .json / .yaml / .txt / ...
+├── services/
+│   ├── normalize_input.js  # or .cel / .tpl / ...
+│   └── high_risk.yaml
+└── docs/              # Local dependencies (auto-imported)
+    ├── thresholds.yaml
+    ├── prompts.md
+    └── helpers.js
+```
+
+**Rules:**
+- Use `_` not `.` in names
+- Only one `contents.*` allowed
+- `docs/` files are auto-imported as local dependencies
 
 ---
 
@@ -402,12 +430,15 @@ import:
 
 #### code/template
 
+Mustache syntax with CEL expression support via `[[ ]]`:
+
 ```yaml
 - name: generate_text
   type: code/template
   expr: |
     Hello, {{input.name}}!
-    Your order {{input.order_id}} has been {{$call("get_status", input)}}.
+    Total: [[price * quantity]]
+    Status: {{$call("get_status", input)}}.
 ```
 
 ### 5.2 Flow Control
@@ -483,6 +514,8 @@ import:
 
 #### tools/http
 
+Template syntax (Mustache + CEL via `[[ ]]`) supported in `url`, `headers`, and `body`:
+
 ```yaml
 - name: api_call
   type: tools/http
@@ -492,20 +525,22 @@ import:
     Authorization: Bearer {{$contents.json("api_key")}}
   body:
     key: "{{input.value}}"
-  response_path: data.result         # Response extraction path
+  response_path: data.result
   timeout_ms: 10000
 ```
 
 #### tools/llm
 
+Both `system` and `expr` support template syntax (Mustache + CEL via `[[ ]]`):
+
 ```yaml
 - name: ask_ai
   type: tools/llm
-  model: gpt-4                      # Optional, uses global config by default
-  system: You are a professional assistant.  # System prompt
-  expr: "{{input.question}}"        # User prompt template
-  temperature: 0.7                  # Temperature 0-2
-  max_tokens: 2000                  # Max tokens
+  model: gpt-4
+  system: "You are a helpful assistant. Context: {{$contents.raw()}}"
+  expr: "{{input.question}}"
+  temperature: 0.7
+  max_tokens: 2000
 ```
 
 ---
@@ -619,7 +654,7 @@ smart://<namespace>/<id>[@<version>][#<fragment>]
 - No `@version`: Uses the current document version as fallback
 - With `#fragment`: Only loads the specified fragment (must be wrapped in quotes to avoid YAML comments)
 
-### 8.4 File Storage
+### 8.4 File Storage (Single File)
 
 ```
 <data-dir>/<namespace>/<id>/<version>/main.yaml
@@ -629,6 +664,29 @@ Example:
 ```
 data/docs/health/bp-assistant/1.0.0/main.yaml
 ```
+
+### 8.5 File Storage (Directory Layout)
+
+For complex documents, you can use directory layout instead of single YAML:
+
+```
+<data-dir>/<namespace>/<id>/<version>/
+├── main.yaml          # Optional, can be empty
+├── meta.yaml          # Optional metadata
+├── contents.md        # Or contents.json / contents.yaml (pick one)
+├── services/          # Service declarations
+│   └── query.js       # Or .yaml
+└── docs/              # Local dependencies (auto-imported)
+    ├── thresholds.yaml
+    ├── prompts.md
+    └── helpers.js
+```
+
+**Rules:**
+- `id` must use `_` not `.` (e.g., `risk_assistant` not `risk.assistant`)
+- Content format: only one of `contents.md`, `contents.json`, `contents.yaml` allowed
+- Service naming: `services/query.js` or `services.query.js`, conflict = error
+- `docs/` files are auto-imported as local dependencies
 
 ---
 
