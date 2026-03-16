@@ -6,9 +6,9 @@
 
 ---
 
-![Smart Text Document Structure](docs/smart-text-structure.png)
+![Smart Text Document Structure](assets/smart-text-structure.png)
 
-![Smart Text Directory Layout](docs/smart-text-directory.png)
+![Smart Text Directory Layout](assets/smart-text-directory.png)
 
 ---
 
@@ -95,7 +95,7 @@ services:
     system: 你是一位全科医生，基于指南回答问题。
     expr: |
       参考指南：
-      {{$contents.raw()}}
+      [[= $contents.raw() ]]
       
       患者问题：{{input.question}}
       
@@ -174,7 +174,7 @@ services:
       type: code/template
       expr: |
         您的血压 {{input.systolic}}/{{input.diastolic}} mmHg 处于正常范围。
-        建议：{{$contents.yaml("healthy_tips")}}
+        建议：[[= $contents.yaml("healthy_tips") ]]
 
   # 3. 高风险：基于指南的 AI 建议（tools/llm）
   - name: high_risk
@@ -182,7 +182,7 @@ services:
     system: 你是专业医生，基于高血压指南给出建议。
     expr: |
       参考指南：
-      {{$import.htn_guide.contents.raw()}}
+      [[= $import.htn_guide.contents.raw() ]]
       
       患者血压：{{input.systolic}}/{{input.diastolic}} mmHg
       请根据指南给出风险评估和建议。
@@ -434,15 +434,15 @@ import:
 
 #### code/template
 
-Mustache 语法，支持 `[[ ]]` 内嵌 CEL 表达式：
+Mustache 语法，支持 `[[= ]]` 内嵌 CEL 表达式：
 
 ```yaml
 - name: generate_text
   type: code/template
   expr: |
     您好，{{input.name}}！
-    总计：[[price * quantity]]
-    状态：{{$call("get_status", input)}}。
+    总计：[[= price * quantity ]]
+    状态：[[= $call("get_status", input) ]]。
 ```
 
 ### 5.2 流程控制
@@ -518,7 +518,7 @@ Mustache 语法，支持 `[[ ]]` 内嵌 CEL 表达式：
 
 #### tools/http
 
-`url`、`headers`、`body` 支持模板语法（Mustache + CEL `[[ ]]`）：
+`url`、`headers`、`body` 支持模板语法（Mustache + CEL `[[= ]]`）：
 
 ```yaml
 - name: api_call
@@ -526,7 +526,7 @@ Mustache 语法，支持 `[[ ]]` 内嵌 CEL 表达式：
   method: POST
   url: https://api.example.com/data
   headers:
-    Authorization: Bearer {{$contents.json("api_key")}}
+    Authorization: Bearer [[= $contents.json("api_key") ]]
   body:
     key: "{{input.value}}"
   response_path: data.result
@@ -535,13 +535,13 @@ Mustache 语法，支持 `[[ ]]` 内嵌 CEL 表达式：
 
 #### tools/llm
 
-`system` 和 `expr` 均支持模板语法（Mustache + CEL `[[ ]]`）：
+`system` 和 `expr` 均支持模板语法（Mustache + CEL `[[= ]]`）：
 
 ```yaml
 - name: ask_ai
   type: tools/llm
   model: gpt-4
-  system: "你是助手。上下文：{{$contents.raw()}}"
+  system: "你是助手。上下文：[[= $contents.raw() ]]"
   expr: "{{input.question}}"
   temperature: 0.7
   max_tokens: 2000

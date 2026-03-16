@@ -8,9 +8,9 @@
 
 ---
 
-![Smart Text Document Structure](docs/smart-text-structure.png)
+![Smart Text Document Structure](assets/smart-text-structure.png)
 
-![Smart Text Directory Layout](docs/smart-text-directory.png)
+![Smart Text Directory Layout](assets/smart-text-directory.png)
 
 ---
 
@@ -97,7 +97,7 @@ services:
     system: You are a general practitioner answering questions based on the guide.
     expr: |
       Reference Guide:
-      {{$contents.raw()}}
+      [[= $contents.raw() ]]
       
       Patient Question: {{input.question}}
       
@@ -176,7 +176,7 @@ services:
       type: code/template
       expr: |
         Your blood pressure {{input.systolic}}/{{input.diastolic}} mmHg is within the normal range.
-        Recommendation: {{$contents.yaml("healthy_tips")}}
+        Recommendation: [[= $contents.yaml("healthy_tips") ]]
 
   # 3. High risk: AI recommendations based on the guide (tools/llm)
   - name: high_risk
@@ -184,7 +184,7 @@ services:
     system: You are a professional doctor providing advice based on the hypertension guide.
     expr: |
       Reference Guide:
-      {{$import.htn_guide.contents.raw()}}
+      [[= $import.htn_guide.contents.raw() ]]
       
       Patient Blood Pressure: {{input.systolic}}/{{input.diastolic}} mmHg
       Please provide a risk assessment and recommendations based on the guide.
@@ -436,15 +436,15 @@ import:
 
 #### code/template
 
-Mustache syntax with CEL expression support via `[[ ]]`:
+Mustache syntax with CEL expression support via `[[= ]]`:
 
 ```yaml
 - name: generate_text
   type: code/template
   expr: |
     Hello, {{input.name}}!
-    Total: [[price * quantity]]
-    Status: {{$call("get_status", input)}}.
+    Total: [[= price * quantity ]]
+    Status: [[= $call("get_status", input) ]].
 ```
 
 ### 5.2 Flow Control
@@ -520,7 +520,7 @@ Mustache syntax with CEL expression support via `[[ ]]`:
 
 #### tools/http
 
-Template syntax (Mustache + CEL via `[[ ]]`) supported in `url`, `headers`, and `body`:
+Template syntax (Mustache + CEL via `[[= ]]`) supported in `url`, `headers`, and `body`:
 
 ```yaml
 - name: api_call
@@ -528,7 +528,7 @@ Template syntax (Mustache + CEL via `[[ ]]`) supported in `url`, `headers`, and 
   method: POST
   url: https://api.example.com/data
   headers:
-    Authorization: Bearer {{$contents.json("api_key")}}
+    Authorization: Bearer [[= $contents.json("api_key") ]]
   body:
     key: "{{input.value}}"
   response_path: data.result
@@ -537,13 +537,13 @@ Template syntax (Mustache + CEL via `[[ ]]`) supported in `url`, `headers`, and 
 
 #### tools/llm
 
-Both `system` and `expr` support template syntax (Mustache + CEL via `[[ ]]`):
+Both `system` and `expr` support template syntax (Mustache + CEL via `[[= ]]`):
 
 ```yaml
 - name: ask_ai
   type: tools/llm
   model: gpt-4
-  system: "You are a helpful assistant. Context: {{$contents.raw()}}"
+  system: "You are a helpful assistant. Context: [[= $contents.raw() ]]"
   expr: "{{input.question}}"
   temperature: 0.7
   max_tokens: 2000
